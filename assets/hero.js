@@ -124,5 +124,11 @@
   var start = (location.hash || '').replace('#', '');
   if (MODES[start]) mode = start;
   document.querySelectorAll('[data-bg]').forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.bg === mode); });
-  setModeClass(); size(); addEventListener('resize', size); requestAnimationFrame(frame);
+  setModeClass(); size(); requestAnimationFrame(frame);
+  // Neu vermessen, sobald sich die Hero-Größe ändert (z. B. wenn Schriften oder Foto nachladen),
+  // sonst wird die beim ersten Messen zu kleine Zeichenfläche verzerrt hochskaliert
+  function resize() { if (c.clientWidth !== W || c.clientHeight !== H) { size(); if (reduce) frame(0); } }
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(c);
+  addEventListener('resize', resize); addEventListener('load', resize);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
 })();
